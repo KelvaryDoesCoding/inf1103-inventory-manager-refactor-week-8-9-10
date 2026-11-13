@@ -2,10 +2,15 @@
 
 import math
 from abc import ABC, abstractmethod
+from supplier import Supplier
 
 
 class Product(ABC):
-    def __init__(self, product_id: str, name: str, price: float, stock: int):
+    def __init__(self, product_id: str, name: str, price: float,
+                 stock: int, supplier: Supplier) -> None:
+        if not isinstance(supplier, Supplier):
+            raise TypeError("Supplier must be a Supplier object.")
+        self.__supplier: Supplier = supplier
         if not isinstance(product_id, str) or not product_id.strip():
             raise ValueError("Product ID cannot be empty.")
         if not isinstance(name, str) or not name.strip():
@@ -14,10 +19,14 @@ class Product(ABC):
             raise ValueError("Price must be a number.")
         if not math.isfinite(price) or price < 0:
             raise ValueError("Price must be a finite, non-negative number.")
-        self.__product_id = product_id.strip().upper()
-        self.__name = name.strip()
-        self.__price = float(price)
+        self.__product_id: str = product_id.strip().upper()
+        self.__name: str = name.strip()
+        self.__price: float = float(price)
         self.update_stock(stock)
+
+    @property
+    def supplier(self) -> Supplier:
+        return self.__supplier
 
     @property
     def product_id(self) -> str:
@@ -39,11 +48,12 @@ class Product(ABC):
         """Replace the current stock with the supplied quantity."""
         if type(quantity) is not int or quantity < 0:
             raise ValueError("Stock must be a non-negative whole number.")
-        self.__stock = quantity
+        self.__stock: int = quantity
 
     def display_information(self) -> None:
         print(f"{self.__product_id:<12} {self.__name:<25} "
               f"${self.__price:>10.2f} {self.__stock:>8}")
+        self.supplier.display_information()
 
     @abstractmethod
     def get_fulfilment_info(self) -> str:

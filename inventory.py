@@ -4,7 +4,7 @@ from product import Product
 
 
 class Inventory:
-    def __init__(self):
+    def __init__(self) -> None:
         self.__products: list[Product] = []
 
     @property
@@ -24,6 +24,18 @@ class Inventory:
         return f"P{max(numbers, default=0) + 1:03d}"
 
     def search_product(self, product_id: str) -> Product | None:
+        """Compatibility name used by the existing menu."""
+        return self.find_product(product_id)
+
+    def remove_product(self, product_id: str) -> Product:
+        """Remove a reference and return the still-existing product."""
+        product = self.find_product(product_id)
+        if product is None:
+            raise ValueError("Product not found.")
+        self.__products.remove(product)
+        return product
+
+    def find_product(self, product_id: str) -> Product | None:
         product_id = product_id.strip().upper()
         for product in self.__products:
             if product.product_id == product_id:
